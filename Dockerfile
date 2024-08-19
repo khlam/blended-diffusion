@@ -1,5 +1,5 @@
 # Base image with CUDA and necessary Python packages
-FROM nvidia/cuda:12.2.2-cudnn8-runtime-ubuntu22.04 as base
+FROM nvidia/cuda:12.2.2-cudnn8-runtime-ubuntu22.04 AS base
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -11,8 +11,7 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/
 
-# Install PyTorch Lightning and other Python dependencies
-RUN pip3 install ftfy regex matplotlib lpips kornia opencv-python torch==1.9.0+cu111 torchvision==0.10.0+cu111 -f https://download.pytorch.org/whl/torch_stable.html
+RUN pip3 install ftfy regex matplotlib lpips kornia opencv-python torch torchvision torchaudio
 
 # Create a user
 RUN useradd -u 1000 -m user
@@ -20,8 +19,17 @@ RUN useradd -u 1000 -m user
 # Set the working directory
 WORKDIR /app
 
-# Copy utils and configuration files
-COPY utils.py /app/
+COPY checkpoints /app/checkpoints
+COPY CLIP /app/CLIP
+COPY guided_diffusion /app/guided_diffusion
+COPY optimization /app/optimization
+COPY utils /app/utils
+COPY main.py /app/
 
-# Set entrypoint for train.py with environment variables
-ENTRYPOINT ["sh", "-c", "python3 -u /app/train.py "]
+ENV PROMPT=""
+ENV INPUT_IMAGE=""
+ENV MASK_IMAGE=""
+ENV OUTPUT_PATH=""
+
+# Set entrypoint for main.py with environment variables
+ENTRYPOINT ["sh", "-c", "python3 -u /app/main.py -p \"$PROMPT\" -i \"$INPUT_IMAGE\" --mask \"$MASK_IMAGE\" --output_path \"$OUTPUT_PATH\""]

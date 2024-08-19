@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./input_example:/app/input_example
+      - ./output:/app/output
+    environment:
+      PROMPT: "rock"
+      INPUT_IMAGE: "input_example/img.png"
+      MASK_IMAGE: "input_example/mask.png"
+      OUTPUT_PATH: "output"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
