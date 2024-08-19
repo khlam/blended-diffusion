@@ -108,7 +108,7 @@ def get_arguments() -> argparse.Namespace:
         "--batch_size",
         type=int,
         help="The number number if images to sample each diffusion process",
-        default=4,
+        default=1,
     )
     parser.add_argument(
         "--vid",
